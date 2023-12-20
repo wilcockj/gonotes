@@ -17,8 +17,11 @@
         {{ "template notes.html" . }}
       </div>
     </div>
-    <form method="post" action="/notes">
-        <label>Note <input type="text" minlength="3" name="notetitle" autofocus required/></label>
+    <form name="noteentry" id="noteentry" method="post" action="/notes">
+        <label>Note title <input type="text" minlength="3" name="notetitle" autofocus required/></label><br/>
+        <label>Note body </label><br/>
+        <textarea form="noteentry" name="notebody" id="notebody" method="post"></textarea><br/>
+        <input type="submit" value="Submit notes!">
     </form>
   </main>
   </body>

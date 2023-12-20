@@ -27,6 +27,13 @@ func hello(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, myString)
 }
 
+func addnotes(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	fmt.Printf("got notes val %s\n", r.FormValue("notetitle"))
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+
+}
+
 /*
 * want to creat note taking app backend
 * allow user to add note
@@ -106,7 +113,8 @@ func main() {
 	err = t.Execute(os.Stdout, noItems)
 	check(err)
 
-	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/", hello)
+	http.HandleFunc("/notes", addnotes)
 	fmt.Println("Beggining serving on port 9060")
 	http.ListenAndServe(":9060", nil)
 }

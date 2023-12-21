@@ -30,6 +30,8 @@ func addnotes(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fmt.Printf("got notes title %s\n", r.FormValue("notetitle"))
 	fmt.Printf("got notes body %s\n", r.FormValue("notebody"))
+	// here i could store into db
+	// when would i fetch on load?
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 
 }

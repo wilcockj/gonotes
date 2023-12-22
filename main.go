@@ -68,8 +68,9 @@ func InitLogger() {
  */
 var tmpl = template.Must(template.ParseFiles("templates/index.html"))
 
-// TODO: add a way to delete the notes
-// TODO: add a way to edit notes
+// TODO: add a way to edit notes, need to have an edit button that
+// returns edit html for that note that then has a post endpoint
+// to submite the edits
 // TODO: render the notes in a nicer way
 // TODO: add css or something for max width of note to look better
 func main() {

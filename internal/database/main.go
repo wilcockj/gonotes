@@ -6,7 +6,6 @@ import (
 	"github.com/wilcockj/gonotes/domain/notes"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 

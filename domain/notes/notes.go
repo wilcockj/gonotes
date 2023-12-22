@@ -9,20 +9,20 @@ import (
 
 type Note struct {
 	CreatedAt time.Time
-	id        uuid.UUID
-	title     string
-	content   string
+	Id        uuid.UUID
+	Title     string
+	Content   string
 }
 
 type List struct {
-	notes []Note
+	Notes []Note
 }
 
 func (notelist *List) Add(title string, content string) {
-	notelist.notes = append(notelist.notes, Note{
+	notelist.Notes = append(notelist.Notes, Note{
 		CreatedAt: time.Now(),
-		content:   content,
-		title:     title,
-		id:        uuid.New(),
+		Content:   content,
+		Title:     title,
+		Id:        uuid.New(),
 	})
 }

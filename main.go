@@ -40,8 +40,10 @@ func addnotes(w http.ResponseWriter, r *http.Request) {
  */
 var tmpl = template.Must(template.ParseFiles("templates/index.html"))
 
+// TODO: add a way to delete the notes
+// TODO: add a way to edit notes
+// TODO: render the notes in a nicer way
 func main() {
-
 	database.Init()
 	http.HandleFunc("/", middleware.Cookie_middleware(home))
 	http.HandleFunc("/notes", middleware.Cookie_middleware(addnotes))

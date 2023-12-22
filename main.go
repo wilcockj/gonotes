@@ -39,12 +39,11 @@ func addnotes(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("got notes title %s\n", r.FormValue("notetitle"))
 	fmt.Printf("got notes body %s\n", r.FormValue("notebody"))
 
+	// store submitted notes into db
 	err := database.AddNotesToDB(r, r.FormValue("notebody"), r.FormValue("notetitle"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	// here i could store into db
-	// when would i fetch on load?
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -54,7 +53,6 @@ func addnotes(w http.ResponseWriter, r *http.Request) {
 * fetch/view note, edit note maybe only send diff?
  */
 func main() {
-	os.Remove("./notes.db")
 	var err error
 	database.DB, err = sql.Open("sqlite3", "./notes.db")
 
@@ -63,7 +61,7 @@ func main() {
 	}
 
 	sqlStmt := `
-	create table notes (user_id text, name text, notes text);
+	create table notes (time text, user_id text, name text, notes text);
 	delete from notes;
 	`
 
@@ -72,19 +70,6 @@ func main() {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return
 	}
-
-	/*
-			sqlStmt = `
-		  insert into foo
-		  values (1,"note name","notes notes my notes are really notes");
-		  `
-
-			_, err = db.Exec(sqlStmt)
-			if err != nil {
-				log.Printf("%q: %s\n", err, sqlStmt)
-				return
-			}
-	*/
 
 	http.HandleFunc("/", middleware.Cookie_middleware(home))
 	http.HandleFunc("/notes", middleware.Cookie_middleware(addnotes))

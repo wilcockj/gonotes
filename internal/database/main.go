@@ -6,6 +6,7 @@ import (
 	"github.com/wilcockj/gonotes/domain/notes"
 	"log"
 	"net/http"
+	"time"
 )
 
 var DB *sql.DB
@@ -15,12 +16,13 @@ func AddNotesToDB(req *http.Request, body string, title string) error {
 	if err != nil {
 		return err
 	}
-	stmt, err := DB.Prepare("insert into notes (user_id, name, notes) VALUES(?,?,?)")
+	stmt, err := DB.Prepare("insert into notes (time, user_id, name, notes) VALUES(?,?,?,?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(cookie.Value, title, body)
+	timestring := time.Now().Format("2006-01-02T15:04:05-0700")
+	_, err = stmt.Exec(timestring, cookie.Value, title, body)
 	if err != nil {
 		return err
 	}
@@ -45,9 +47,15 @@ func GetNotesFromDB(req *http.Request) notes.List {
 
 	for rows.Next() {
 		var newnote notes.Note
-		if err := rows.Scan(&newnote.Id, &newnote.Content, &newnote.Title); err != nil {
+		var timecreated string
+		if err := rows.Scan(&timecreated, &newnote.Id, &newnote.Content, &newnote.Title); err != nil {
 			log.Fatal(err)
 			return noteslist
+		}
+		log.Println(timecreated)
+		newnote.CreatedAt, err = time.Parse("2006-01-02T15:04:05-0700", timecreated)
+		if err != nil {
+			log.Fatal(err)
 		}
 		noteslist.Notes = append(noteslist.Notes, newnote)
 	}

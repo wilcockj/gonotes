@@ -73,6 +73,8 @@ var tmpl = template.Must(template.ParseFiles("templates/index.html"))
 // to submite the edits
 // TODO: render the notes in a nicer way
 // TODO: add css or something for max width of note to look better
+// TODO: change the submit to be able to ctrl+enter on note body to 
+// submit or something might be a htmx thing
 func main() {
 	InitLogger()
 	database.Init()

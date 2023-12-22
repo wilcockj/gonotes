@@ -48,7 +48,7 @@ func GetNotesFromDB(req *http.Request) notes.List {
 	for rows.Next() {
 		var newnote notes.Note
 		var timecreated string
-		if err := rows.Scan(&timecreated, &newnote.Id, &newnote.Content, &newnote.Title); err != nil {
+		if err := rows.Scan(&timecreated, &newnote.Id, &newnote.Title, &newnote.Content); err != nil {
 			log.Fatal(err)
 			return noteslist
 		}

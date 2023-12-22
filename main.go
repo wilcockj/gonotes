@@ -1,16 +1,13 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wilcockj/gonotes/internal/database"
 	"github.com/wilcockj/gonotes/internal/middleware"
 	"html/template"
-	//	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 func home(w http.ResponseWriter, req *http.Request) {
@@ -19,24 +16,7 @@ func home(w http.ResponseWriter, req *http.Request) {
 	// get notes for session
 	notes := database.GetNotesFromDB(req)
 	fmt.Println(notes)
-
-	//file, err := os.Open("templates/index.html")
-
 	tmpl.Execute(w, notes)
-	/*
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer func() {
-			if err = file.Close(); err != nil {
-				log.Fatal(err)
-			}
-		}()
-
-		b, err := io.ReadAll(file)
-		myString := string(b[:])
-		fmt.Fprintf(w, myString)
-	*/
 }
 
 func addnotes(w http.ResponseWriter, r *http.Request) {
@@ -62,26 +42,7 @@ var tmpl = template.Must(template.ParseFiles("templates/index.html"))
 
 func main() {
 
-	// TODO: only create table if not exists
-	os.Remove("./notes.db")
-	var err error
-	database.DB, err = sql.Open("sqlite3", "./notes.db")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	sqlStmt := `
-	create table notes (time text, user_id text, name text, notes text);
-	delete from notes;
-	`
-
-	_, err = database.DB.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
-		return
-	}
-
+	database.Init()
 	http.HandleFunc("/", middleware.Cookie_middleware(home))
 	http.HandleFunc("/notes", middleware.Cookie_middleware(addnotes))
 	fmt.Println("Beggining serving on port 9060")

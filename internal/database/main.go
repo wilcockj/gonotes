@@ -6,6 +6,7 @@ import (
 	"github.com/wilcockj/gonotes/domain/notes"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -72,4 +73,48 @@ func GetNotesFromDB(req *http.Request) notes.List {
 		log.Fatal(err)
 	}
 	return noteslist
+}
+
+func Init() {
+	var err error
+	DB, err = sql.Open("sqlite3", "./notes.db")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	notesTableExists, err := tableExists("notes")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if notesTableExists {
+		// don't need to create table
+		return
+	}
+
+	sqlStmt := `
+	create table notes (time text, user_id text, name text, notes text);
+	delete from notes;
+	`
+
+	_, err = DB.Exec(sqlStmt)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmt)
+		return
+	}
+
+}
+
+func tableExists(tableName string) (bool, error) {
+	var name string
+	query := "SELECT name FROM sqlite_master WHERE type='table' AND name=?;" // Use the appropriate query for your database
+	row := DB.QueryRow(query, tableName)
+	if err := row.Scan(&name); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil // Table does not exist
+		}
+		return false, err // An error occurred
+	}
+	return true, nil // Table exists
 }

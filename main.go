@@ -6,7 +6,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wilcockj/gonotes/internal/database"
 	"github.com/wilcockj/gonotes/internal/middleware"
-	"io"
+	"html/template"
+	//	"io"
 	"log"
 	"net/http"
 	"os"
@@ -19,19 +20,23 @@ func home(w http.ResponseWriter, req *http.Request) {
 	notes := database.GetNotesFromDB(req)
 	fmt.Println(notes)
 
-	file, err := os.Open("templates/index.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err = file.Close(); err != nil {
+	//file, err := os.Open("templates/index.html")
+
+	tmpl.Execute(w, notes)
+	/*
+		if err != nil {
 			log.Fatal(err)
 		}
-	}()
+		defer func() {
+			if err = file.Close(); err != nil {
+				log.Fatal(err)
+			}
+		}()
 
-	b, err := io.ReadAll(file)
-	myString := string(b[:])
-	fmt.Fprintf(w, myString)
+		b, err := io.ReadAll(file)
+		myString := string(b[:])
+		fmt.Fprintf(w, myString)
+	*/
 }
 
 func addnotes(w http.ResponseWriter, r *http.Request) {
@@ -51,8 +56,14 @@ func addnotes(w http.ResponseWriter, r *http.Request) {
 * want to creat note taking app backend
 * allow user to add note
 * fetch/view note, edit note maybe only send diff?
+* how to return template
  */
+var tmpl = template.Must(template.ParseFiles("templates/index.html"))
+
 func main() {
+
+	// TODO: only create table if not exists
+	os.Remove("./notes.db")
 	var err error
 	database.DB, err = sql.Open("sqlite3", "./notes.db")
 

@@ -3,14 +3,33 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/wilcockj/gonotes/internal/middleware"
 	"io"
 	"log"
 	"net/http"
 	"os"
 )
 
+func setSessionCookieIfAbsent(w http.ResponseWriter, r *http.Request) {
+	// Check if the user already has a cookie to mark session
+	if _, err := r.Cookie("user_id"); err != nil {
+		// Create a new UUID for the user
+		newUUID := uuid.New().String()
+
+		// Set a new cookie with the UUID
+		http.SetCookie(w, &http.Cookie{
+			Name:  "user_id",
+			Value: newUUID,
+			Path:  "/",
+			// Other attributes like Expires, Secure, HttpOnly as necessary
+		})
+	}
+}
+
 func home(w http.ResponseWriter, req *http.Request) {
+	setSessionCookieIfAbsent(w, req)
 	file, err := os.Open("templates/index.html")
 	if err != nil {
 		log.Fatal(err)
@@ -27,13 +46,13 @@ func home(w http.ResponseWriter, req *http.Request) {
 }
 
 func addnotes(w http.ResponseWriter, r *http.Request) {
+	setSessionCookieIfAbsent(w, r)
 	r.ParseForm()
 	fmt.Printf("got notes title %s\n", r.FormValue("notetitle"))
 	fmt.Printf("got notes body %s\n", r.FormValue("notebody"))
 	// here i could store into db
 	// when would i fetch on load?
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-
 }
 
 /*
@@ -71,8 +90,8 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/", home)
-	http.HandleFunc("/notes", addnotes)
+	http.HandleFunc("/", middleware.Cookie_middleware(home))
+	http.HandleFunc("/notes", middleware.Cookie_middleware(addnotes))
 	fmt.Println("Beggining serving on port 9060")
 	http.ListenAndServe(":9060", nil)
 }

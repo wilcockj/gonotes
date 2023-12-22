@@ -9,7 +9,8 @@ import (
 
 type Note struct {
 	CreatedAt time.Time
-	Id        uuid.UUID
+	NoteUuid  string
+	UserId    string
 	Title     string
 	Content   string
 }
@@ -18,11 +19,12 @@ type List struct {
 	Notes []Note
 }
 
-func (notelist *List) Add(title string, content string) {
+func (notelist *List) Add(user_id string, title string, content string) {
 	notelist.Notes = append(notelist.Notes, Note{
 		CreatedAt: time.Now(),
 		Content:   content,
 		Title:     title,
-		Id:        uuid.New(),
+		NoteUuid:  uuid.New().String(),
+		UserId:    user_id,
 	})
 }

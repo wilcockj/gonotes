@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/wilcockj/gonotes/internal/database"
-	"github.com/wilcockj/gonotes/internal/middleware"
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
+
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/wilcockj/gonotes/internal/database"
+	"github.com/wilcockj/gonotes/internal/middleware"
 )
 
 func home(w http.ResponseWriter, req *http.Request) {
@@ -19,7 +21,7 @@ func home(w http.ResponseWriter, req *http.Request) {
 	tmpl.Execute(w, notes)
 }
 
-func addnotes(w http.ResponseWriter, r *http.Request) {
+func addNotes(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fmt.Printf("got notes title %s\n", r.FormValue("notetitle"))
 	fmt.Printf("got notes body %s\n", r.FormValue("notebody"))
@@ -30,6 +32,29 @@ func addnotes(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func deleteNotes(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("path was ", req.URL.Path)
+	note_to_delete := strings.Split(req.URL.Path, "/")
+
+	fmt.Println("Attempting to delete note", note_to_delete[2])
+	// actually remove note from the DB
+	database.RemoveNotesFromDB(note_to_delete[2])
+
+	// re-render the homepage with the newly removed
+	// note gone
+	http.Redirect(w, req, "/", http.StatusSeeOther)
+}
+
+func notesHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("ASDASDAD In notes handler")
+	fmt.Println(req.Method)
+	if req.Method == "POST" {
+		addNotes(w, req)
+	} else if req.Method == "DELETE" {
+		deleteNotes(w, req)
+	}
 }
 
 /*
@@ -47,7 +72,8 @@ var tmpl = template.Must(template.ParseFiles("templates/index.html"))
 func main() {
 	database.Init()
 	http.HandleFunc("/", middleware.Cookie_middleware(home))
-	http.HandleFunc("/notes", middleware.Cookie_middleware(addnotes))
+	http.HandleFunc("/notes/", middleware.Cookie_middleware(notesHandler))
+	http.HandleFunc("/notes", middleware.Cookie_middleware(notesHandler))
 	fmt.Println("Beggining serving on port 9060")
 	http.ListenAndServe(":9060", nil)
 }

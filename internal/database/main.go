@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wilcockj/gonotes/domain/notes"
 	"log"
@@ -16,13 +17,19 @@ func AddNotesToDB(req *http.Request, body string, title string) error {
 	if err != nil {
 		return err
 	}
-	stmt, err := DB.Prepare("insert into notes (time, user_id, name, notes) VALUES(?,?,?,?)")
+
+	stmt, err := DB.Prepare("insert into notes (time, user_id, name, notes, note_uuid) VALUES(?,?,?,?,?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
+
 	timestring := time.Now().Format("2006-01-02T15:04:05-0700")
-	_, err = stmt.Exec(timestring, cookie.Value, title, body)
+
+	// Create uuid to be able to reference this note
+	noteuuid := uuid.New().String()
+
+	_, err = stmt.Exec(timestring, cookie.Value, title, body, noteuuid)
 	if err != nil {
 		return err
 	}
@@ -48,7 +55,7 @@ func GetNotesFromDB(req *http.Request) notes.List {
 	for rows.Next() {
 		var newnote notes.Note
 		var timecreated string
-		if err := rows.Scan(&timecreated, &newnote.Id, &newnote.Title, &newnote.Content); err != nil {
+		if err := rows.Scan(&timecreated, &newnote.UserId, &newnote.Title, &newnote.Content, &newnote.NoteUuid); err != nil {
 			log.Fatal(err)
 			return noteslist
 		}
@@ -74,6 +81,13 @@ func GetNotesFromDB(req *http.Request) notes.List {
 	return noteslist
 }
 
+func RemoveNotesFromDB(note_to_delete string) {
+	_, err := DB.Exec("delete from notes where note_uuid = ?", note_to_delete)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func Init() {
 	var err error
 	DB, err = sql.Open("sqlite3", "./notes.db")
@@ -93,7 +107,7 @@ func Init() {
 	}
 
 	sqlStmt := `
-	create table notes (time text, user_id text, name text, notes text);
+	create table notes (time text, user_id text, name text, notes text, note_uuid text);
 	delete from notes;
 	`
 

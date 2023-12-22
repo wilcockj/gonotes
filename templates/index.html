@@ -13,16 +13,22 @@
     <br/>
       <h1>notes list</h1>
       <div>
+        <!-- TODO: move this to another html file-->
         {{ range .Notes}}
+        <div id={{.NoteUuid}}>
         <b>{{.Title}}</b>
         <p>{{.Content}}</p>
+             <button type="button">Edit Notes</button>
+             <button hx-target="body" hx-delete="notes/{{.NoteUuid}}" type="button">Delete Notes</button>
+        </div>
+        <br/>
         {{end}}
       </div>
     </div>
     <form name="noteentry" id="noteentry" method="post" action="/notes">
         <label>Note title <input type="text" minlength="3" name="notetitle" autofocus required/></label><br/>
         <label>Note body </label><br/>
-        <textarea form="noteentry" name="notebody" id="notebody" method="post"></textarea><br/>
+        <textarea rows=10 cols=40 form="noteentry" name="notebody" id="notebody" method="post"></textarea><br/>
         <input type="submit" value="Submit notes!">
     </form>
   </main>

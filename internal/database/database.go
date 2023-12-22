@@ -42,7 +42,8 @@ func GetNotesFromDB(req *http.Request) notes.List {
 	var noteslist notes.List
 	cookie, err := req.Cookie("user_id")
 	if err != nil {
-		log.Fatal(err)
+		//no cookie :(
+		return noteslist
 	}
 
 	// where user_id = cookie_id

@@ -38,7 +38,7 @@ func deleteNotes(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("path was ", req.URL.Path)
 	note_to_delete := strings.Split(req.URL.Path, "/")
 
-	fmt.Println("Attempting to delete note", note_to_delete[2])
+	log.Println("Attempting to delete note", note_to_delete[2])
 	// actually remove note from the DB
 	database.RemoveNotesFromDB(note_to_delete[2])
 
@@ -48,13 +48,16 @@ func deleteNotes(w http.ResponseWriter, req *http.Request) {
 }
 
 func notesHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("ASDASDAD In notes handler")
-	fmt.Println(req.Method)
 	if req.Method == "POST" {
 		addNotes(w, req)
 	} else if req.Method == "DELETE" {
 		deleteNotes(w, req)
 	}
+}
+
+func InitLogger() {
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
 }
 
 /*
@@ -70,6 +73,7 @@ var tmpl = template.Must(template.ParseFiles("templates/index.html"))
 // TODO: render the notes in a nicer way
 // TODO: add css or something for max width of note to look better
 func main() {
+	InitLogger()
 	database.Init()
 	http.HandleFunc("/", middleware.Cookie_middleware(home))
 	http.HandleFunc("/notes/", middleware.Cookie_middleware(notesHandler))

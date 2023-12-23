@@ -26,7 +26,7 @@ func SetSessionCookieIfAbsent(w http.ResponseWriter, r *http.Request) {
 func Cookie_middleware(f http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		SetSessionCookieIfAbsent(w, r)
-		log.Println(r.URL.Path)
+		log.Println(r.Method, r.URL.Path)
 		f(w, r)
 	}
 }

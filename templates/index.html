@@ -21,7 +21,7 @@
         <div id={{.NoteUuid}}>
         <b>{{.Title}}</b>
         <p>{{.Content}}</p>
-             <button type="button">Edit Notes</button>
+          <button type="button" hx-get="notes/{{.NoteUuid}}" hx-swap="outerHTML">Edit Notes</button>
              <button hx-target="body" hx-delete="notes/{{.NoteUuid}}" type="button">Delete Notes</button>
         </div>
         <br/>

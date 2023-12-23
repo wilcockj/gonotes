@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"html/template"
-	"log"
-	"net/http"
-	"strings"
-
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/wilcockj/gonotes/domain/notes"
 	"github.com/wilcockj/gonotes/internal/database"
 	"github.com/wilcockj/gonotes/internal/middleware"
+	"html/template"
+	"log"
+	"net/http"
+	"path"
 )
 
 func ExecuteTemplate(w http.ResponseWriter, notes notes.List) {
@@ -44,15 +43,31 @@ func addNotes(w http.ResponseWriter, r *http.Request) {
 
 func deleteNotes(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("path was ", req.URL.Path)
-	note_to_delete := strings.Split(req.URL.Path, "/")
+	note_to_delete := path.Base(req.URL.Path)
 
-	log.Println("Attempting to delete note", note_to_delete[2])
+	log.Println("Attempting to delete note", note_to_delete)
 	// actually remove note from the DB
-	database.RemoveNotesFromDB(note_to_delete[2])
+	database.RemoveNotesFromDB(note_to_delete)
 
 	// re-render the homepage with the newly removed
 	// note gone
 	http.Redirect(w, req, "/", http.StatusSeeOther)
+}
+
+func editNotes(w http.ResponseWriter, req *http.Request) {
+	note_to_edit := path.Base(req.URL.Path)
+	usernotes := database.GetNotesFromDB(req)
+	var note notes.Note
+	// need to look through list and find note.NoteUuid == note_to_edit
+	for _, n := range usernotes.Notes {
+		if n.NoteUuid == note_to_edit {
+			note = n
+			break
+		}
+	}
+	fmt.Println("Want to edit", note_to_edit)
+	var tmpl = template.Must(template.ParseFiles("templates/edit.html"))
+	tmpl.Execute(w, note)
 }
 
 func notesHandler(w http.ResponseWriter, req *http.Request) {
@@ -60,6 +75,8 @@ func notesHandler(w http.ResponseWriter, req *http.Request) {
 		addNotes(w, req)
 	} else if req.Method == "DELETE" {
 		deleteNotes(w, req)
+	} else if req.Method == "GET" {
+		editNotes(w, req)
 	}
 }
 

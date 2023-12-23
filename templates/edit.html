@@ -9,9 +9,8 @@
   <input id="noteedit_submit" type="submit" value="Submit Edit">
   </form>
 
-<!--
 <script>
-  document.getElementById('notebody').addEventListener('keydown', function(event) {
+  document.getElementById('noteedit_body_{{.NoteUuid}}').addEventListener('keydown', function(event) {
     if (event.ctrlKey && event.key === 'Enter') {
         event.preventDefault();
 
@@ -20,5 +19,5 @@
         htmx.trigger(this.form, 'submit');
     }
   });
-</script>-->
+</script>
 </div>

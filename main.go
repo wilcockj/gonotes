@@ -115,13 +115,8 @@ func InitLogger() {
 * how to return template
  */
 
-// TODO: add a way to edit notes, need to have an edit button that
-// returns edit html for that note that then has a post endpoint
-// to submite the edits
 // TODO: render the notes in a nicer way
 // TODO: add css or something for max width of note to look better
-// TODO: change the submit to be able to ctrl+enter on note body to
-// submit or something might be a htmx thing
 func main() {
 	InitLogger()
 	database.Init()

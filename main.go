@@ -8,9 +8,17 @@ import (
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/wilcockj/gonotes/domain/notes"
 	"github.com/wilcockj/gonotes/internal/database"
 	"github.com/wilcockj/gonotes/internal/middleware"
 )
+
+func ExecuteTemplate(w http.ResponseWriter, notes notes.List) {
+	// TODO: parsing the file every time is nice for dev
+	// but shouldn't be there forever, disk slow
+	var tmpl = template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.Execute(w, notes)
+}
 
 func home(w http.ResponseWriter, req *http.Request) {
 	// on getting the home page, need to check the db for
@@ -18,7 +26,7 @@ func home(w http.ResponseWriter, req *http.Request) {
 	// get notes for session
 	notes := database.GetNotesFromDB(req)
 	fmt.Println(notes)
-	tmpl.Execute(w, notes)
+	ExecuteTemplate(w, notes)
 }
 
 func addNotes(w http.ResponseWriter, r *http.Request) {
@@ -66,14 +74,13 @@ func InitLogger() {
 * fetch/view note, edit note maybe only send diff?
 * how to return template
  */
-var tmpl = template.Must(template.ParseFiles("templates/index.html"))
 
 // TODO: add a way to edit notes, need to have an edit button that
 // returns edit html for that note that then has a post endpoint
 // to submite the edits
 // TODO: render the notes in a nicer way
 // TODO: add css or something for max width of note to look better
-// TODO: change the submit to be able to ctrl+enter on note body to 
+// TODO: change the submit to be able to ctrl+enter on note body to
 // submit or something might be a htmx thing
 func main() {
 	InitLogger()

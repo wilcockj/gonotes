@@ -8,6 +8,8 @@
     <title>Go + HTMX + sqlite3 Notes app</title>
   </head>
   <body hx-boost="true" style="text-align:center">
+
+
     <main>
     <div>
     <br/>
@@ -26,14 +28,27 @@
         {{end}}
       </div>
     </div>
-    <form name="noteentry" id="noteentry" method="post" action="/notes">
+    <form name="noteentry" id="noteentry" action="/notes" hx-post="/notes" hx-target="body">
 	    <label>Note title</label><br/>
 	    <input type="text" minlength="3" name="notetitle" autofocus required/><br/>
         <label>Note body </label><br/>
         <textarea rows=10 cols=40 form="noteentry" name="notebody" id="notebody" method="post"></textarea><br/>
-        <input type="submit" value="Submit notes!">
+        <input id="noteentry_submit" type="submit" value="Submit notes!">
     </form>
   </main>
+
+  <script>
+  document.getElementById('notebody').addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault();
+
+        // trigger the form submission with ctrl+enter
+        // when inside of the textarea
+        htmx.trigger(this.form, 'submit');
+    }
+  });
+  </script>
+
   </body>
 
 <html>

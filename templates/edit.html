@@ -1,6 +1,24 @@
-<div>
-	<span>Edit Note {{.Title}}</span>
-	<textarea rows=10 cols=40>
-		{{.Content}}
-	</textarea><br/>
+<div id="edit_{{.NoteUuid}}">
+	<span>Edit Note</span>
+  <form name="noteedit_{{.NoteUuid}}" id="noteedit_{{.NoteUuid}}" hx-patch="/notes/{{.NoteUuid}}" hx-target="body">
+    <textarea form="noteedit_{{.NoteUuid}}" 
+      name="noteedit_body_{{.NoteUuid}}" 
+      id="noteedit_body_{{.NoteUuid}}" 
+      rows=10 
+      cols=40>{{.Content}}</textarea><br/>
+  <input id="noteedit_submit" type="submit" value="Submit Edit">
+  </form>
+
+<!--
+<script>
+  document.getElementById('notebody').addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault();
+
+        // trigger the form submission with ctrl+enter
+        // when inside of the textarea
+        htmx.trigger(this.form, 'submit');
+    }
+  });
+</script>-->
 </div>

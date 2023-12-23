@@ -20,9 +20,12 @@
         {{ range .Notes}}
         <div id={{.NoteUuid}}>
         <b>{{.Title}}</b>
+        <div id="content_{{.NoteUuid}}">
         <p>{{.Content}}</p>
-          <button type="button" hx-get="notes/{{.NoteUuid}}" hx-swap="outerHTML">Edit Notes</button>
-             <button hx-target="body" hx-delete="notes/{{.NoteUuid}}" type="button">Delete Notes</button>
+          <button type="button" hx-get="notes/{{.NoteUuid}}" hx-swap="outerHTML" hx-target="#content_{{.NoteUuid}}">Edit Notes</button>
+          <button hx-target="body" hx-delete="notes/{{.NoteUuid}}" type="button">Delete Notes</button>
+        </div>
+
         </div>
         <br/>
         {{end}}

@@ -37,6 +37,13 @@ func AddNotesToDB(req *http.Request, body string, title string) error {
 
 }
 
+func UpdateNote(note_uuid string, new_note_body string) {
+	_, err := DB.Exec("update notes set notes = ? where note_uuid = ?", new_note_body, note_uuid)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func GetNotesFromDB(req *http.Request) notes.List {
 
 	var noteslist notes.List

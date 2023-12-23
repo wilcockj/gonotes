@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"strings"
 )
 
 func ExecuteTemplate(w http.ResponseWriter, notes notes.List) {
@@ -54,7 +55,9 @@ func deleteNotes(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
-func editNotes(w http.ResponseWriter, req *http.Request) {
+func geteditNotes(w http.ResponseWriter, req *http.Request) {
+	// this function will return the edit
+	// form for this note
 	note_to_edit := path.Base(req.URL.Path)
 	usernotes := database.GetNotesFromDB(req)
 	var note notes.Note
@@ -66,8 +69,25 @@ func editNotes(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	fmt.Println("Want to edit", note_to_edit)
+	fmt.Println(note)
 	var tmpl = template.Must(template.ParseFiles("templates/edit.html"))
-	tmpl.Execute(w, note)
+	err := tmpl.Execute(w, note)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func editNotes(w http.ResponseWriter, req *http.Request) {
+	note_to_edit := path.Base(req.URL.Path)
+
+	req.ParseForm()
+	fmt.Println(req.Form)
+	fmt.Println(note_to_edit)
+	form_key := []string{"noteedit_body_", note_to_edit}
+	new_note_body := req.FormValue(strings.Join(form_key, ""))
+	fmt.Println("making edit to set to ", new_note_body)
+	database.UpdateNote(note_to_edit, new_note_body)
+	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
 func notesHandler(w http.ResponseWriter, req *http.Request) {
@@ -76,13 +96,15 @@ func notesHandler(w http.ResponseWriter, req *http.Request) {
 	} else if req.Method == "DELETE" {
 		deleteNotes(w, req)
 	} else if req.Method == "GET" {
+		geteditNotes(w, req)
+	} else if req.Method == "PATCH" {
 		editNotes(w, req)
 	}
+
 }
 
 func InitLogger() {
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.Lmicroseconds | log.Lshortfile | log.LstdFlags)
 }
 
 /*

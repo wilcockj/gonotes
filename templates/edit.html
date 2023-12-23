@@ -1,6 +1,6 @@
 <div id="edit_{{.NoteUuid}}">
 	<span>Edit Note</span>
-  <form name="noteedit_{{.NoteUuid}}" id="noteedit_{{.NoteUuid}}" hx-patch="/notes/{{.NoteUuid}}" hx-target="body">
+  <form name="noteedit_{{.NoteUuid}}" id="noteedit_{{.NoteUuid}}" hx-patch="/editnote/{{.NoteUuid}}" hx-target="body">
     <textarea form="noteedit_{{.NoteUuid}}" 
       name="noteedit_body_{{.NoteUuid}}" 
       id="noteedit_body_{{.NoteUuid}}" 

@@ -55,7 +55,7 @@ func deleteNotes(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
-func geteditNotes(w http.ResponseWriter, req *http.Request) {
+func geteditNote(w http.ResponseWriter, req *http.Request) {
 	// this function will return the edit
 	// form for this note
 	note_to_edit := path.Base(req.URL.Path)
@@ -68,8 +68,6 @@ func geteditNotes(w http.ResponseWriter, req *http.Request) {
 			break
 		}
 	}
-	fmt.Println("Want to edit", note_to_edit)
-	fmt.Println(note)
 	var tmpl = template.Must(template.ParseFiles("templates/edit.html"))
 	err := tmpl.Execute(w, note)
 	if err != nil {
@@ -77,15 +75,13 @@ func geteditNotes(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func editNotes(w http.ResponseWriter, req *http.Request) {
+func updateNote(w http.ResponseWriter, req *http.Request) {
 	note_to_edit := path.Base(req.URL.Path)
 
 	req.ParseForm()
-	fmt.Println(req.Form)
-	fmt.Println(note_to_edit)
 	form_key := []string{"noteedit_body_", note_to_edit}
 	new_note_body := req.FormValue(strings.Join(form_key, ""))
-	fmt.Println("making edit to set to ", new_note_body)
+	log.Println("making edit to set to", new_note_body)
 	database.UpdateNote(note_to_edit, new_note_body)
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
@@ -95,10 +91,15 @@ func notesHandler(w http.ResponseWriter, req *http.Request) {
 		addNotes(w, req)
 	} else if req.Method == "DELETE" {
 		deleteNotes(w, req)
+	}
+
+}
+
+func notesEditHandler(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "PATCH" {
+		updateNote(w, req)
 	} else if req.Method == "GET" {
-		geteditNotes(w, req)
-	} else if req.Method == "PATCH" {
-		editNotes(w, req)
+		geteditNote(w, req)
 	}
 
 }
@@ -127,6 +128,8 @@ func main() {
 	http.HandleFunc("/", middleware.Cookie_middleware(home))
 	http.HandleFunc("/notes/", middleware.Cookie_middleware(notesHandler))
 	http.HandleFunc("/notes", middleware.Cookie_middleware(notesHandler))
+	http.HandleFunc("/editnote", middleware.Cookie_middleware(notesEditHandler))
+	http.HandleFunc("/editnote/", middleware.Cookie_middleware(notesEditHandler))
 	fmt.Println("Beggining serving on port 9060")
 	http.ListenAndServe(":9060", nil)
 }

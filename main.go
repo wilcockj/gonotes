@@ -118,6 +118,7 @@ func InitLogger() {
 // TODO: render the notes in a nicer way
 // TODO: add css or something for max width of note to look better
 // TODO: add timestamp to display of notes
+// TODO: change timestamp on edit of note
 func main() {
 	InitLogger()
 	database.Init()

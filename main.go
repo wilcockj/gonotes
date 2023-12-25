@@ -119,6 +119,8 @@ func InitLogger() {
 // TODO: add css or something for max width of note to look better
 // TODO: add timestamp to display of notes
 // TODO: change timestamp on edit of note
+// TODO: add view where you see the whole note
+// have a htop bar to change mode, single view, back to all note view
 func main() {
 	InitLogger()
 	database.Init()
